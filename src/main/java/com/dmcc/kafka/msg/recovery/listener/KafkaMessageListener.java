@@ -13,47 +13,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class KafkaMessageListener {
-		
+
 	@Autowired
 	private ObjectMapper objectMapper;
 	private KafkaTemplate<String, LotMasterDTO> template;
+
 	@KafkaListener(topics = "OriginalTopic", groupId = "KafkaDemo", containerFactory = "kafkaListenerContainerFactory")
 	public void mainTopicListener(String meesage, Acknowledgment ackMode) throws Exception {
 		LotMasterDTO lotMasterDTO = null;
-		System.out.println(" \n ::before Processing the OriginalTopic :: \n");
 		
 		try {
 			lotMasterDTO = objectMapper.readValue(meesage, LotMasterDTO.class);
-			if(lotMasterDTO.getVariety() != null) {
-				System.out.println("Processed OriginalTopic ::"+lotMasterDTO.toString());
-			
-			}else {
-				
+			if (lotMasterDTO.getVariety() != null) {
+				System.out.println("Processed OriginalTopic ::" + lotMasterDTO.toString());
+
+			} else {
+
 				throw new NullPointerException();
 			}
 			ackMode.acknowledge();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		System.out.println(" \\n ::after Listening the Main Topic :: \n");
 		
+
 	}
-	@KafkaListener(topics = "RecoveryTopic", groupId = "KafkaDemo", containerFactory = "kafkaRetryListenerContainerFactory")
-	public void retryTopicListener(String meesage, Acknowledgment ackMode) throws Exception {
-		LotMasterDTO lotMasterDTO = null;
-		System.out.println(" \n ::before Listening the RecoveryTopic :: \n");
-		try {
-			lotMasterDTO = objectMapper.readValue(meesage, LotMasterDTO.class);
-			
-			System.out.println("RecoveryTopic Processed ::"+lotMasterDTO.toString());
-			
-			
-			ackMode.acknowledge();
-		} catch (JsonProcessingException e) {
-						
-			e.printStackTrace();
-		}
-		System.out.println(" \n ::After Listening the RecoveryTopic :: \n");
-		
-	}
+
 }

@@ -1,7 +1,5 @@
 package com.dmcc.kafka.msg.recovery.config;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,14 +26,13 @@ import org.springframework.retry.support.RetryTemplate;
 
 import com.dmcc.kafka.msg.recovery.dto.EventMessageProcesserDTO;
 import com.dmcc.kafka.msg.recovery.dto.LotMasterDTO;
-import com.dmcc.kafka.msg.recovery.service.MessagepersistanceService;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.dmcc.kafka.msg.recovery.service.EventMessageProcesserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class KafkaConsumerConfig {
 	@Autowired
-	MessagepersistanceService messagepersistanceService;
+	EventMessageProcesserService eventMessageProcesserService;
 
 	@Bean
 	public ConsumerFactory messageConsumerFactory() {
@@ -74,13 +71,27 @@ public class KafkaConsumerConfig {
 				 * and process accordingly
 				 */
 				try {
+
+					String serviceCode = "DASSVC";
+
 					ConsumerRecord consumerRecord = (ConsumerRecord) context
 							.getAttribute(RetryingMessageListenerAdapter.CONTEXT_RECORD);
-					System.out.println("sending message to DB ...." + consumerRecord.value());
-					EventMessageProcesserDTO eventMessageProcesserDTO = prepareEventMessageProcesserDTO(
-							consumerRecord.value().toString());
-					messagepersistanceService.save(eventMessageProcesserDTO);
-					System.out.println(":::: Message Sent to DB::::");
+					System.out
+							.println("in RecoveryCallback Processing message ...." + consumerRecord.value().toString());
+
+					LotMasterDTO lotMasterDTO = (LotMasterDTO) new ObjectMapper().readValue(consumerRecord.value().toString(), LotMasterDTO.class);
+
+					
+					if (lotMasterDTO.getEventMsgId() != null) {
+						System.out.println(":::: Duplicate Message with mssage Id::::"+lotMasterDTO.getEventMsgId());
+					} else {
+						System.out.println("::Message persistitng as it is first time ::" );
+						EventMessageProcesserDTO eventMessageProcesserDTO = eventMessageProcesserService
+								.prepareAndSaveEventMessage(serviceCode, consumerRecord.value().toString(),
+										"LotMasterDTO", consumerRecord.topic());
+
+					}
+
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -106,24 +117,6 @@ public class KafkaConsumerConfig {
 		return factory;
 	}
 
-	public EventMessageProcesserDTO prepareEventMessageProcesserDTO(String message) {
-
-		EventMessageProcesserDTO eventMessageProcesserDTO = new EventMessageProcesserDTO();
-		long seqId = messagepersistanceService.getMessageIdSeq();
-		System.out.println(":::::::::::seqId:::::::::::"+seqId);
-		eventMessageProcesserDTO.setMessageId(seqId);
-		eventMessageProcesserDTO.setFailureReason("DB Lock");
-		eventMessageProcesserDTO.setDescription("Failed due to DB Lock");
-		eventMessageProcesserDTO.setMessage(message);
-		eventMessageProcesserDTO.setStatus("FAILED");
-		eventMessageProcesserDTO.setCreatedBy("Author");
-		eventMessageProcesserDTO.setModifiedBy("Author");
-		eventMessageProcesserDTO.setCreatedDateTime(new Date());
-		eventMessageProcesserDTO.setModifiedDateTime(new Date());
-
-		return eventMessageProcesserDTO;
-	}
-
 	@Bean(name = "kafkaRetryListenerContainerFactory")
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaRetryListenerContainerFactory(
 			KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper) {
@@ -143,7 +136,6 @@ public class KafkaConsumerConfig {
 		FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
 		fixedBackOffPolicy.setBackOffPeriod(3000);
 		retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
-
 		Map<Class<? extends Throwable>, Boolean> exceptionMap = new HashMap<>();
 		exceptionMap.put(IllegalArgumentException.class, false);
 		exceptionMap.put(TimeoutException.class, false);

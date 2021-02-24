@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,36 +19,54 @@ public class EventMessageProcesserDTO {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
 	private Long id;
-	
-	
-	@Column(name = "MessageId")
-	private Long MessageId;
-	
-	public Long getMessageId() {
-		return MessageId;
-	}
 
-	public void setMessageId(Long messageId) {
-		MessageId = messageId;
-	}
-	
+	@Column(name = "MessageId")
+	private String messageId;
+
 	@Column(name = "FailureReason")
 	private String failureReason;
-	
+
 	@Column(name = "ModuleName")
 	private String moduleName;
 
 	@Column(name = "Description")
 	private String description;
 
-	
 	@Column(name = "Message")
 	private String message;
-	
+
 	@Column(name = "Status")
 	private String status;
 
+	@Column(name = "RecordStatus")
+	private String recordStatus;
+
+	@Column(name = "CreatedBy")
+	private String createdBy;
+
+	@Column(name = "CreatedDateTime")
+	private Date createdDateTime;
+
+	@Column(name = "ModifiedBy")
+	private String modifiedBy;
+
+	@Column(name = "ModifiedDateTime")
+	private Date modifiedDateTime;
+
+	@Column(name = "NoofAttmepts")
+	private String noofAttmepts;
 	
+	@Column(name = "TopicName")
+	private String topicName;
+
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -57,21 +74,14 @@ public class EventMessageProcesserDTO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	@Column(name = "RecordStatus")
-	private String recordStatus;
 
-	@Column(name = "CreatedBy")
-	private String createdBy;
-	
-	@Column(name = "CreatedDateTime")
-	private Date createdDateTime;
+	public String getMessageId() {
+		return messageId;
+	}
 
-	
-	@Column(name = "ModifiedBy")
-	private String modifiedBy;
-
-	@Column(name = "ModifiedDateTime")
-	private Date modifiedDateTime;
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
+	}
 
 	public Long getId() {
 		return id;
@@ -153,24 +163,33 @@ public class EventMessageProcesserDTO {
 		this.modifiedDateTime = modifiedDateTime;
 	}
 
-	
+	public String getNoofAttmepts() {
+		return noofAttmepts;
+	}
+
+	public void setNoofAttmepts(String noofAttmepts) {
+		this.noofAttmepts = noofAttmepts;
+	}
+
 	@Override
 	public String toString() {
-		return "EventMessageProcesserDTO [id=" + id + ", MessageId=" + MessageId + ", failureReason=" + failureReason
+		return "EventMessageProcesserDTO [id=" + id + ", MessageId=" + messageId + ", failureReason=" + failureReason
 				+ ", moduleName=" + moduleName + ", description=" + description + ", message=" + message + ", status="
-				+ status + ", recordStatus=" + recordStatus + ", createdBy=" + createdBy + ", createdDateTime="
-				+ createdDateTime + ", modifiedBy=" + modifiedBy + ", modifiedDateTime=" + modifiedDateTime + "]";
+				+ status + ", recordStatus=" + recordStatus + ", createdBy=" + createdBy + ", noofAttmepts="
+				+ noofAttmepts + ", createdDateTime=" + createdDateTime + ", modifiedBy=" + modifiedBy
+				+ ", modifiedDateTime=" + modifiedDateTime + "]";
 	}
 
 	public EventMessageProcesserDTO() {
-		//Default Constructor
+		// Default Constructor
 	}
-	public EventMessageProcesserDTO(Long id, Long messageId, String failureReason, String moduleName, String description,
-			String message, String recordStatus, String createdBy, Date createdDateTime, String modifiedBy,
-			Date modifiedDateTime) {
+
+	public EventMessageProcesserDTO(Long id, String messageId, String failureReason, String moduleName,
+			String description, String message, String recordStatus, String createdBy, Date createdDateTime,
+			String modifiedBy, Date modifiedDateTime, String noofAttmepts) {
 		super();
 		this.id = id;
-		this.MessageId = messageId;
+		this.messageId = messageId;
 		this.failureReason = failureReason;
 		this.moduleName = moduleName;
 		this.description = description;
@@ -180,9 +199,7 @@ public class EventMessageProcesserDTO {
 		this.createdDateTime = createdDateTime;
 		this.modifiedBy = modifiedBy;
 		this.modifiedDateTime = modifiedDateTime;
+		this.noofAttmepts = noofAttmepts;
 	}
-	
-	
-	
 
 }

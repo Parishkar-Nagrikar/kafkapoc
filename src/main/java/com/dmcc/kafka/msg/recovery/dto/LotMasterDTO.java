@@ -2,21 +2,11 @@ package com.dmcc.kafka.msg.recovery.dto;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author 1002410
  *
  */
-public class LotMasterDTO {
+public class LotMasterDTO implements Cloneable {
 
 	private Integer lotId;
 
@@ -31,6 +21,10 @@ public class LotMasterDTO {
 	private BigDecimal totalQuantity;
 
 	private Integer variety;
+
+	private String EventMsgStatus;
+	
+	private String EventMsgId;
 
 	public BigDecimal getTotalQuantity() {
 		return totalQuantity;
@@ -89,10 +83,35 @@ public class LotMasterDTO {
 	}
 
 	@Override
+	public LotMasterDTO clone() throws CloneNotSupportedException {
+		// TODO Auto-generated constructor stub
+		return (LotMasterDTO) super.clone();
+	}
+
+	public String getEventMsgStatus() {
+		return EventMsgStatus;
+	}
+
+	public void setEventMsgStatus(String eventMsgStatus) {
+		EventMsgStatus = eventMsgStatus;
+	}
+
+	public String getEventMsgId() {
+		return EventMsgId;
+	}
+
+	public void setEventMsgId(String eventMsgId) {
+		EventMsgId = eventMsgId;
+	}
+
+	@Override
 	public String toString() {
 		return "LotMasterDTO [lotId=" + lotId + ", lotStatus=" + lotStatus + ", lotVersion=" + lotVersion
-				+ ", lotCreationType=" + lotCreationType + ", totalQuality=" + totalQuality + ", variety=" + variety
-				+ "]";
+				+ ", lotCreationType=" + lotCreationType + ", totalQuality=" + totalQuality + ", totalQuantity="
+				+ totalQuantity + ", variety=" + variety + ", EventMsgStatus=" + EventMsgStatus + ", EventMsgId="
+				+ EventMsgId + "]";
 	}
+
+	
 
 }
